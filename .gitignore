@@ -1,0 +1,48 @@
+
+# Logs and Diagnostic Reports
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime Data and Coverage
+pids
+*.pid
+*.seed
+*.pid.lock
+coverage
+*.lcov
+.nyc_output
+
+# Dependency and Build Outputs
+node_modules/
+dist/
+build/Release
+*.tsbuildinfo
+.npm
+
+# Environment Variables and REPL History
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+.node_repl_history
+
+# ESLint, Stylelint, and Other Cache
+.eslintcache
+.stylelintcache
+
+# Parcel, Next.js, and Gatsby
+.cache
+.parcel-cache
+.next
+out
+.cache/
+
+# System Files
+.DS_Store
