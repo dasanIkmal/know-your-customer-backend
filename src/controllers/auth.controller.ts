@@ -1,56 +1,79 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { User } from "../models/user.model";
-import { generateToken } from "../configs/jwt";
-import { ResponseHandler } from "../utils/handleResponse.util";
+import {
+  generateToken,
+  generateRefreshToken,
+  validateRefreshToken,
+} from "../configs/jwt";
 
 export class AuthController {
+  // Handle user login and token generation
   userLogin = async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
 
-      // Check if the user exists
+      // Check if the user exists in the database
       const user = await User.findOne({ email });
       if (!user) {
-        return ResponseHandler.sendErrorResponse(
-          res,
-          "Invalid email or password",
-          401
-        );
+        res.status(401).json({ message: "No User Found" });
+        return;
       }
 
-      // Validate password
+      // Validate the provided password
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        return ResponseHandler.sendErrorResponse(
-          res,
-          "Invalid email or password",
-          401
-        );
+        res.status(401).json({ message: "Invalid email or password" });
+        return;
       }
 
-      // Generate JWT
-      const token = generateToken(user.id);
+      // Generate tokens for the user
+      const accessToken = generateToken(user.id);
+      const refreshToken = generateRefreshToken(user.id);
 
-      ResponseHandler.sendSuccessResponse(
-        res,
-        {
-          message: "Login successful",
-          token: token,
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          },
+      res.status(200).json({
+        message: "Login successful",
+        accessToken,
+        refreshToken,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
         },
-        "Login successful!!",
-        200,
-        false
-      );
+      });
     } catch (error) {
       console.error("Login error:", error);
-      ResponseHandler.sendErrorResponse(res, "Error during login", 500);
+      res.status(500).json({ message: "Error during login" });
+    }
+  };
+
+  // Handle token refresh
+  refreshToken = async (req: Request, res: Response) => {
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        res.status(400).json({ message: "Refresh token is required" });
+        return;
+      }
+
+      // Validate the provided refresh token
+      const decoded = validateRefreshToken(refreshToken);
+      const userId = (decoded as any).id;
+
+      // Generate new access and refresh tokens
+      const newAccessToken = generateToken(userId);
+      const newRefreshToken = generateRefreshToken(userId);
+
+      res.status(200).json({
+        message: "Token refreshed successfully",
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
+    } catch (error) {
+      console.error("Refresh token error:", error);
+      res.status(401).json({ message: "Invalid or expired refresh token" });
     }
   };
 }

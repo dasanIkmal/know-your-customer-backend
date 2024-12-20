@@ -1,5 +1,11 @@
 export const requiredEnvVars: string[] = [
   "JWT_SECRET",
   "JWT_EXPIRES_IN",
+  "JWT_REFRESH_SECRET",
+  "JWT_REFRESH_EXPIRES_IN",
   "MONGO_URI",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+  "AWS_REGION",
+  "AWS_S3_BUCKET_NAME",
 ];

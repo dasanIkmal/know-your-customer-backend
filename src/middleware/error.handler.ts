@@ -7,12 +7,14 @@ const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  logger.error(err.stack); // Log the stack trace of the error
-  logger.error("err.message"); // Log the error message
+  // Log the error stack trace and message for debugging
+  logger.error(err.stack);
+  logger.error(err.message);
+
+  // Respond with a generic or specific error message
   res.status(err.status || 500).json({
     message: err.message || "An unexpected error occurred",
-    // Include the stack trace in the response if in development mode
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack }), // Provide stack trace only in development
   });
 };
 
